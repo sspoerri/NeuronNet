@@ -1,6 +1,8 @@
 #include "simulation.h"
 #include "random.h"
 
+#include <tclap/ArgException.h>
+
 /*!
   \mainpage %Neuron network dynamics
 

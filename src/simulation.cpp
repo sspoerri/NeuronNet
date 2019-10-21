@@ -2,6 +2,8 @@
 #include "random.h"
 #include "simulation.h"
 
+#include <tclap/CmdLine.h>
+
 Simulation::Simulation(int argc, char **argv) {
     parse(argc, argv);
 }

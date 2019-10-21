@@ -1,5 +1,5 @@
 #include "network.h"
-#include <tclap/CmdLine.h>
+#include <tclap/Constraint.h>
 
 /*! \class Simulation
   This is the main class. 

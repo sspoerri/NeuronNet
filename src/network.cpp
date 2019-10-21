@@ -4,6 +4,7 @@
 void Network::resize(const size_t &n, double inhib) {
     size_t old = size();
     neurons.resize(n);
+    neighbor_dp.resize(n);
     if (n <= old) return;
     size_t nfs(inhib*(n-old)+.5);
     set_default_params({{"FS", nfs}}, old);
@@ -127,4 +128,53 @@ void Network::print_traj(const int time, const std::map<std::string, size_t> &_n
                 break;
             }
     (*_out) << std::endl;
+}
+
+std::vector<std::pair<size_t, double> > Network::neighbors(const size_t& n)
+{
+	if(not neighbor_dp[n].empty())
+		return neighbor_dp[n];
+	
+	std::vector<std::pair<size_t, double> > nn;
+	
+	for( const auto&[key, value] : links ) {
+		if(key.first == n)
+			nn.emplace_back( key.second, value );
+	}
+	
+	return neighbor_dp[n] = nn;
+}
+
+std::pair<size_t, double> Network::degree(const size_t& n)
+{
+	std::vector<std::pair<size_t, double> > nn( neighbors(n) );
+	double sum(0.0);
+	for(size_t i(0); i<nn.size(); ++i)
+		sum += nn[i].second;
+	return { nn.size(), sum };
+}
+
+std::set<size_t> Network::step(const std::vector<double>& t)
+{
+	std::set<size_t> f;
+	for(size_t i(0); i<neurons.size(); ++i ) {	
+		if(neurons[i].firing()) {
+			f.insert(i);
+			neurons[i].reset();
+		}
+	}
+	for(size_t i(0); i<neurons.size(); ++i ) {
+		double I(t[i]);
+		if(neurons[i].is_inhibitory())
+			I *= 0.4;
+		std::vector<std::pair<size_t, double> > nn( neighbors(i) );
+		for(size_t j(0); j<nn.size(); ++j ) {
+			if(neurons[nn[j].first].firing()) {
+				I += nn[j].second;
+			}
+		}
+		neurons[i].input(I);
+		neurons[i].step();
+	}
+	return f;
 }
