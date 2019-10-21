@@ -1,0 +1,8 @@
+#binaries
+build/
+
+#docs
+doc/
+
+#macOS
+**/.DS_STORE
