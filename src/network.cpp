@@ -132,16 +132,14 @@ void Network::print_traj(const int time, const std::map<std::string, size_t> &_n
 
 std::vector<std::pair<size_t, double> > Network::neighbors(const size_t& n)
 {
+	//if already calculated return value
 	if(not neighbor_dp[n].empty())
 		return neighbor_dp[n];
-	
+
 	std::vector<std::pair<size_t, double> > nn;
-	
-	for( const auto&[key, value] : links ) {
-		if(key.first == n)
-			nn.emplace_back( key.second, value );
+	for(auto it(links.lower_bound({n,0})); (it->first).first == n; it++ ) {
+		nn.emplace_back( (it->first).second, it->second );
 	}
-	
 	return neighbor_dp[n] = nn;
 }
 
